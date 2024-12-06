@@ -5,6 +5,8 @@ appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.9.3"
 constraintlayout = "2.2.0"
+ffmpegPlatform = "7.1-1.5.11"
+javacvPlatform = "1.5.11"
 
 [libraries]
 
@@ -12,6 +14,8 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+ffmpeg-platform = { group = "org.bytedeco", name = "ffmpeg-platform", version.ref = "ffmpegPlatform" }
+javacv-platform = { group = "org.bytedeco", name = "javacv-platform", version.ref = "javacvPlatform" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

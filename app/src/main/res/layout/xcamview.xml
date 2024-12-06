@@ -9,11 +9,10 @@
         android:layout_height="match_parent">
     </TextureView>
 
-    <com.camtest.FaceDetectionOverlayView
-        android:id="@+id/overlayView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </com.camtest.FaceDetectionOverlayView>
+     <com.camtest.TimeStampOverlayView
+         android:id="@+id/overlayView"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent">
+     </com.camtest.TimeStampOverlayView>
 
 </FrameLayout>

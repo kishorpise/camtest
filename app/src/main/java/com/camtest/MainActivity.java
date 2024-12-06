@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         xcameraview = findViewById(R.id.xcameraview);
+
         if (CheckPermissions()) {
 
         }
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void ButtonClickx(View view) {
 
-
+        xcameraview.ButtonPress();
 
     }
 }
