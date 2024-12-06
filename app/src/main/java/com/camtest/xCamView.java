@@ -6,7 +6,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -19,12 +18,11 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.FaceDetector;
+
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
@@ -45,7 +43,7 @@ import androidx.core.content.ContextCompat;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.List;
+
 
 public class xCamView extends FrameLayout {
     private static final long DOUBLE_CLICK_TIME_DELTA = 300; // Time in milliseconds
@@ -55,7 +53,7 @@ public class xCamView extends FrameLayout {
     private static final int REQUEST_CODE_PERMISSIONS = 1;
     static int numberOfCameras = 0;
     static int currentCamera = 0;
-    static boolean isHeadUnit;
+
     static String tag = "xcamview";
     private final Context context;
     private Size previewSize;
@@ -93,10 +91,10 @@ public class xCamView extends FrameLayout {
     private MediaRecorder mediaRecorder;
     private final String TAG = "Camera View";
     private final long lastClickTime = 0;
-    private Surface previewSurface;
-    private Surface recordingSurface;
+
+
     private boolean isRecording = false;
-    private Handler backgroundHandler;
+
     private CameraManager cameraManager;
     private TimeStampOverlayView overlayView;
     private final long lastExecutionTime = 0; // Variable to store the last execution time
@@ -137,6 +135,7 @@ public class xCamView extends FrameLayout {
     public xCamView(Context context, Activity callingAct) {
         super(context);
         this.context = context;
+        this.callingAct = callingAct;
         init();
     }
 
@@ -217,67 +216,64 @@ public class xCamView extends FrameLayout {
         initializeViews();
 
 
-        this.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
+        this.setOnTouchListener((v, event) -> {
 
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Handle Long Press Detection
-                        startTime = System.currentTimeMillis();
-                        isLongPress = false;
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    // Handle Long Press Detection
+                    startTime = System.currentTimeMillis();
+                    isLongPress = false;
 
-                        // Handle Double Tap Detection
-                        long currentTime = System.currentTimeMillis();
-                        if (currentTime - lastTapTime < DOUBLE_TAP_THRESHOLD) {
-                            // It's a double tap
-                            onDoubleTap();
-                        }
-                        lastTapTime = currentTime;
+                    // Handle Double Tap Detection
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastTapTime < DOUBLE_TAP_THRESHOLD) {
+                        // It's a double tap
+                        onDoubleTap();
+                    }
+                    lastTapTime = currentTime;
 
-                        // Handle Multi-Touch Detection
-                        isMultiTouch = event.getPointerCount() > 1;
+                    // Handle Multi-Touch Detection
+                    isMultiTouch = event.getPointerCount() > 1;
 
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        // Check if it's a Long Press
-                        long duration = System.currentTimeMillis() - startTime;
-                        if (duration >= LONG_PRESS_THRESHOLD && !isLongPress) {
-                            isLongPress = true;
-                            ButtonPress();
-                        }
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    // Check if it's a Long Press
+                    long duration = System.currentTimeMillis() - startTime;
+                    if (duration >= LONG_PRESS_THRESHOLD && !isLongPress) {
+                        isLongPress = true;
+                        ButtonPress();
+                    }
 
-                        // Handle end of touch, also checking if multi-touch ends
-                        if (isMultiTouch) {
-                            onMultiTouchEnd();
-                        }
+                    // Handle end of touch, also checking if multi-touch ends
+                    if (isMultiTouch) {
+                        onMultiTouchEnd();
+                    }
 
-                        return true;
+                    return true;
 
-                    case MotionEvent.ACTION_MOVE:
-                        // Optionally, handle movements if needed
-                        return true;
+                case MotionEvent.ACTION_MOVE:
+                    // Optionally, handle movements if needed
+                    return true;
 
-                    case MotionEvent.ACTION_POINTER_DOWN:
-                        // Handle additional fingers for multi-touch
-                        if (event.getPointerCount() > 1) {
-                            isMultiTouch = true;
-                        }
-                        return true;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    // Handle additional fingers for multi-touch
+                    if (event.getPointerCount() > 1) {
+                        isMultiTouch = true;
+                    }
+                    return true;
 
-                    case MotionEvent.ACTION_POINTER_UP:
-                        // Handle when additional fingers are lifted
-                        if (event.getPointerCount() <= 1) {
-                            isMultiTouch = false;
-                        }
-                        return true;
+                case MotionEvent.ACTION_POINTER_UP:
+                    // Handle when additional fingers are lifted
+                    if (event.getPointerCount() <= 1) {
+                        isMultiTouch = false;
+                    }
+                    return true;
 
-                    default:
-                        return false;
-                }
-
-
+                default:
+                    return false;
             }
+
+
         });
 
 
@@ -477,17 +473,8 @@ public class xCamView extends FrameLayout {
                 stopRecording();
                 startRecording(); // Start a new recording chunk
             }).start();
-        } catch (IllegalStateException ex) {
+        } catch (IllegalStateException | IllegalArgumentException | UnknownError | IOException ex) {
             ex.printStackTrace();
-            stopRecording();
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-            stopRecording();
-        } catch (UnknownError ex) {
-            ex.printStackTrace();
-            stopRecording();
-        } catch (IOException e) {
-            e.printStackTrace();
             stopRecording();
         }
     }
@@ -540,17 +527,8 @@ public class xCamView extends FrameLayout {
                 stopRecording();
                 startRecording();
             }).start();
-        } catch (IllegalStateException ex) {
+        } catch (IllegalStateException | IOException | UnknownError | IllegalArgumentException ex) {
             ex.printStackTrace();
-            stopRecording();
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-            stopRecording();
-        } catch (UnknownError ex) {
-            ex.printStackTrace();
-            stopRecording();
-        } catch (IOException e) {
-            e.printStackTrace();
             stopRecording();
         }
     }

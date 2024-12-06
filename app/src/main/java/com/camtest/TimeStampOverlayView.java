@@ -10,10 +10,13 @@ import android.view.View;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class TimeStampOverlayView extends View {
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MM yy - hh:mm:ss");
+    private Paint paint = new Paint();
+    private   Date currentDate = new Date();
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MM yy - hh:mm:ss" , Locale.ENGLISH);
     public TimeStampOverlayView(Context context) {
         super(context);
     }
@@ -30,14 +33,12 @@ public class TimeStampOverlayView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Paint paint = new Paint();
+
         paint.setColor(Color.RED);
-        Date currentDate = new Date();
+
         String formattedDateTime = dateFormat.format(currentDate);
         canvas.drawText(formattedDateTime , 5, 20, paint);
     }
 
-    public void clear() {
-        invalidate();
-    }
+
 }
